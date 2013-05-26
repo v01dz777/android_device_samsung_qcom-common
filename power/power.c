@@ -29,6 +29,8 @@
 #define SCALING_GOVERNOR_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
 #define BOOSTPULSE_ONDEMAND "/sys/devices/system/cpu/cpufreq/ondemand/boostpulse"
 #define BOOSTPULSE_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
+#define BOOSTPULSE_SAKURACTIVE "/sys/devices/system/cpu/cpufreq/sakuractive/boost_timeout"
+#define BOOST_CPUFREQ "/sys/devices/system/cpu/cpu0/cpufreq/boost_cpufreq"
 #define SAMPLING_RATE_SCREEN_ON "50000"
 #define SAMPLING_RATE_SCREEN_OFF "500000"
 #define TIMER_RATE_SCREEN_ON "30000"
@@ -39,6 +41,7 @@ struct cm_power_module {
     pthread_mutex_t lock;
     int boostpulse_fd;
     int boostpulse_warned;
+    int boost_cpufreq_fd;
 };
 
 static char governor[20];
@@ -153,6 +156,8 @@ static int boostpulse_open(struct cm_power_module *cm)
                 cm->boostpulse_fd = open(BOOSTPULSE_ONDEMAND, O_WRONLY);
             else if (strncmp(governor, "interactive", 11) == 0)
                 cm->boostpulse_fd = open(BOOSTPULSE_INTERACTIVE, O_WRONLY);
+            else if (strncmp(governor, "sakuractive", 11) == 0)
+                cm->boostpulse_fd = open(BOOSTPULSE_SAKURACTIVE, O_WRONLY);
 
             if (cm->boostpulse_fd < 0 && !cm->boostpulse_warned) {
                 strerror_r(errno, buf, sizeof(buf));
@@ -167,6 +172,21 @@ static int boostpulse_open(struct cm_power_module *cm)
 
     pthread_mutex_unlock(&cm->lock);
     return cm->boostpulse_fd;
+}
+
+static int boost_cpufreq_open(struct cm_power_module *cm)
+{
+    char buf[80];
+    pthread_mutex_lock(&cm->lock);
+
+    if (cm->boost_cpufreq_fd < 0) {
+        cm->boost_cpufreq_fd = open(BOOST_CPUFREQ, O_WRONLY);
+        strerror_r(errno, buf, sizeof(buf));
+        ALOGE("Error opening boost cpufreq: %s\n", buf);
+    }
+
+    pthread_mutex_unlock(&cm->lock);
+    return cm->boost_cpufreq_fd;
 }
 
 static void cm_power_hint(struct power_module *module, power_hint_t hint,
@@ -195,6 +215,21 @@ static void cm_power_hint(struct power_module *module, power_hint_t hint,
                 close(cm->boostpulse_fd);
                 cm->boostpulse_fd = -1;
                 cm->boostpulse_warned = 0;
+                pthread_mutex_unlock(&cm->lock);
+            }
+        }
+        if (boost_cpufreq_open(cm) >= 0) {
+            buf[0] = '1';
+            buf[1] = '\0';
+            len = write(cm->boost_cpufreq_fd, buf, strlen(buf));
+
+            if (len < 0) {
+                strerror_r(errno, buf, sizeof(buf));
+	            ALOGE("Error writing to boost_cpufreq: %s\n", buf);
+
+                pthread_mutex_lock(&cm->lock);
+                close(cm->boost_cpufreq_fd);
+                cm->boost_cpufreq_fd = -1;
                 pthread_mutex_unlock(&cm->lock);
             }
         }
@@ -237,4 +272,5 @@ struct cm_power_module HAL_MODULE_INFO_SYM = {
     lock: PTHREAD_MUTEX_INITIALIZER,
     boostpulse_fd: -1,
     boostpulse_warned: 0,
+    boost_cpufreq_fd: -1,
 };
