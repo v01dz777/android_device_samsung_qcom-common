@@ -15,7 +15,7 @@
 
 # Media config
 PRODUCT_COPY_FILES += \
-	device/samsung/qcom-common/media/media_codecs.xml:system/etc/media_codecs.xml
+    device/samsung/qcom-common/media/media_codecs.xml:system/etc/media_codecs.xml
 
 # QCOM Display
 PRODUCT_PACKAGES += \
@@ -66,6 +66,19 @@ PRODUCT_COPY_FILES += \
     system/extras/bugmailer/bugmailer.sh:system/bin/bugmailer.sh \
     system/extras/bugmailer/send_bug:system/bin/send_bug
 
+# Thermal profiles
+PRODUCT_PACKAGES += \
+    thermald-8064ab.conf \
+    thermald-8064.conf \
+    thermald-8930.conf \
+    thermald-8930ab.conf \
+    thermald-8960.conf \
+    thermald-8960ab.conf \
+    thermal-engine-8064ab.conf \
+    thermal-engine-8064.conf \
+    thermal-engine-8930.conf \
+    thermal-engine-8960.conf
+
 # Init scripts
 PRODUCT_PACKAGES += \
     init.qcom.post_boot.sh \
@@ -88,4 +101,3 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += charger charger_res_images
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
-
