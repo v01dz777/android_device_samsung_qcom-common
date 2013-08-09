@@ -32,7 +32,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.composition.type=dyn \
     persist.hwc.mdpcomp.enable=true \
     debug.mdpcomp.logs=0 \
-    ro.telephony.ril_class=SamsungQualcommRIL
+    ro.telephony.ril_class=SamsungQualcommRIL \
+    qcom.hw.aac.encoder=true \
+    hwui.text_gamma_correction=shader \
+    hwui.use_gpu_pixel_buffers=true
+    ## enable pbo on adreno 3xx family, there is a check that check if it has opengles3
 
 # GalaxyS3Settings
 # TODO: Move here
@@ -95,3 +99,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += charger charger_res_images
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
+
+# Common overlay
+DEVICE_PACKAGE_OVERLAYS += device/samsung/qcom-common/overlay
