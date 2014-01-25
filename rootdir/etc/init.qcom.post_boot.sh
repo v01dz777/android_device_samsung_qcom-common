@@ -150,6 +150,7 @@ case "$target" in
          echo "interactive" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
          echo "interactive" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
          echo "interactive" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+         echo 95 > /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
          echo 1 > /sys/devices/system/cpu/cpufreq/interactive/io_is_busy
          echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
          echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
@@ -174,7 +175,8 @@ case "$target" in
          chown system /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
          chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
          chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
-	 echo 1 > /sys/module/msm_thermal/core_control/enabled
+         echo 1 > /dev/cpuctl/apps/cpu.notify_on_migrate
+         echo 1 > /sys/module/msm_thermal/core_control/enabled
          chown root.system /sys/devices/system/cpu/mfreq
          chmod 220 /sys/devices/system/cpu/mfreq
          chown root.system /sys/devices/system/cpu/cpu1/online
