@@ -35,9 +35,6 @@ on boot
     write /sys/devices/system/cpu/cpu3/online 0
     setprop recovery.perf.mode 0
 
-on charger
-    start choice_fn
-
 on property:recovery.perf.mode=1
     write /sys/devices/system/cpu/cpu1/online 1
     write /sys/devices/system/cpu/cpu2/online 1
@@ -55,19 +52,3 @@ on property:recovery.perf.mode=0
     write /sys/devices/system/cpu/cpu1/online 0
     write /sys/devices/system/cpu/cpu2/online 0
     write /sys/devices/system/cpu/cpu3/online 0
-
-service choice_fn /sbin/choice_fn
-    disabled
-    seclabel u:r:recovery:s0
-
-service detect_key /sbin/detect_key
-    disabled
-    seclabel u:r:recovery:s0
-
-service offmode_charging /sbin/offmode_charging
-    disabled
-    seclabel u:r:recovery:s0
-
-service power_test /sbin/power_test
-    disabled
-    seclabel u:r:recovery:s0
