@@ -28,6 +28,9 @@ TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 # Charger percentage
 BOARD_CHARGER_SHOW_PERCENTAGE := true
 
+# CMHW
+BOARD_HARDWARE_CLASS += hardware/samsung/cmhw
+
 # Graphics
 USE_OPENGL_RENDERER := true
 TARGET_USES_C2D_COMPOSITION := true
